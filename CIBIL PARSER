@@ -1,0 +1,264 @@
+# Define a function to parse the JSON data and extract the fields
+def parse_json(row):
+    try:
+        # Load the JSON data from the api_response column
+        response = json.loads(row['api_response'])
+        
+        # Extract the relevant fields from the JSON data
+        is_success = response.get('is_success', None)
+        cibil_fetch_date = response['apimsg']['consumerCreditData'][0]['tuefHeader']['dateProcessed']
+        names = response['apimsg']['consumerCreditData'][0]['names'][0]['name']
+        birth_date = response['apimsg']['consumerCreditData'][0]['names'][0]['birthDate']
+        gender = response['apimsg']['consumerCreditData'][0]['names'][0]['gender']
+        score = response['apimsg']['consumerCreditData'][0]['scores'][0]['score']
+        total_accounts= response['apimsg']['consumerSummaryData']['accountSummary']['totalAccounts']
+        overdue_accounts= response['apimsg']['consumerSummaryData']['accountSummary']['overdueAccounts']
+        closed_accounts= response['apimsg']['consumerSummaryData']['accountSummary']['zeroBalanceAccounts']
+        total_sanctioned_amount= response['apimsg']['consumerSummaryData']['accountSummary']['highCreditAmount']
+        total_current_balance_rem= response['apimsg']['consumerSummaryData']['accountSummary']['currentBalance']
+        total_overdue_running= response['apimsg']['consumerSummaryData']['accountSummary']['overdueBalance']
+        recent_account_opened= response['apimsg']['consumerSummaryData']['accountSummary']['recentDateOpened']
+        total_current_balance_rem= response['apimsg']['consumerSummaryData']['accountSummary']['oldestDateOpened']
+        total_enquiry= response['apimsg']['consumerSummaryData']['inquirySummary']['totalInquiry']
+        last_30_days_enq= response['apimsg']['consumerSummaryData']['inquirySummary']['inquiryPast30Days']
+        last_12_days_enq= response['apimsg']['consumerSummaryData']['inquirySummary']['inquiryPast12Months']
+        last_24_days_enq= response['apimsg']['consumerSummaryData']['inquirySummary']['inquiryPast24Months']
+        recent_enq_done= response['apimsg']['consumerSummaryData']['inquirySummary']['recentInquiryDate']
+        
+        
+        ###############################################################################################################
+        
+        #We need to Extract all ID details from the cibil response
+        
+        # Extracting account details
+        identities = response['apimsg']['consumerCreditData'][0].get('ids', [])
+        
+        # Initialize a dictionary to hold account details
+        identities_data = {
+            'id_type': [],
+            'id_number': [],
+            
+            # Add other fields as necessary
+        }
+
+        # Iterate over each account and extract details
+        for identity in identities:
+            identities_data['id_type'].append(identity.get('idType', ''))
+            identities_data['id_number'].append(identity.get('idNumber', ''))
+         
+        
+        ########################################################################################################   
+        
+        #########################################################################################################
+        
+        #We need to Extract all TELEPHONE details from the cibil response
+        
+        # Extracting account details
+        telephones = response['apimsg']['consumerCreditData'][0].get('telephones', [])
+        
+        # Initialize a dictionary to hold account details
+        telephones_data = {
+            'telephone_number': [],
+            'telephone_type': [],
+            
+            # Add other fields as necessary
+        }
+
+        # Iterate over each account and extract details
+        for telephone in telephones:
+            telephones_data['telephone_number'].append(telephone.get('telephoneNumber', ''))
+            telephones_data['telephone_type'].append(telephone.get('telephoneType', ''))
+            
+        
+        ########################################################################################################
+        
+        #########################################################################################################
+        
+        #We need to Extract all EMAIL details from the cibil response
+        
+        # Extracting account details
+        emails = response['apimsg']['consumerCreditData'][0].get('emails', [])
+        
+        # Initialize a dictionary to hold account details
+        emails_data = {
+            'emailID': [],
+            
+            # Add other fields as necessary
+        }
+
+        # Iterate over each account and extract details
+        for email in emails:
+            emails_data['emailID'].append(email.get('emailID', ''))
+                    
+        
+        ########################################################################################################
+        
+        #########################################################################################################
+        
+        #We need to Extract all ADDRESS details from the cibil response
+        
+        # Extracting account details
+        addresses = response['apimsg']['consumerCreditData'][0].get('addresses', [])
+        
+        # Initialize a dictionary to hold account details
+        addresses_data = {
+            'addr_line1': [],
+            'addr_line2': [],
+            'addr_stateCode': [],
+            'addr_pincode': [],
+            'addr_category': [],
+            'addr_reported': [],
+
+            
+
+            
+            # Add other fields as necessary
+        }
+
+        # Iterate over each account and extract details
+        for address in addresses:
+            addresses_data['addr_line1'].append(address.get('line1', ''))
+            addresses_data['addr_line2'].append(address.get('line2', ''))
+            addresses_data['addr_stateCode'].append(address.get('stateCode', ''))
+            addresses_data['addr_pincode'].append(address.get('pinCode', ''))
+            addresses_data['addr_category'].append(address.get('addressCategory', ''))
+            addresses_data['addr_reported'].append(address.get('dateReported', ''))
+                    
+        
+        ########################################################################################################
+
+
+        # Extracting account details
+        accounts = response['apimsg']['consumerCreditData'][0].get('accounts', [])
+        
+        # Initialize a dictionary to hold account details
+        accounts_data = {
+            'account_type': [],
+            'ownership_indicator': [],
+            'date_reported': [],
+            "date_opened":[],
+            "highCreditAmount":[],
+            "currentBalance":[],
+            "paymentHistory":[],
+            "paymentStartDate":[],
+            "paymentEndDate":[],
+            "paymentFrequency":[]
+            
+            
+            # Add other fields as necessary
+        }
+
+        # Iterate over each account and extract details
+        for account in accounts:
+            accounts_data['account_type'].append(account.get('accountType', ''))
+            accounts_data['ownership_indicator'].append(account.get('ownershipIndicator', ''))
+            accounts_data['date_reported'].append(account.get('dateReported', ''))
+            accounts_data['date_opened'].append(account.get('dateOpened', ''))
+            accounts_data['highCreditAmount'].append(account.get('highCreditAmount', ''))
+            accounts_data['currentBalance'].append(account.get('currentBalance', ''))
+            accounts_data['paymentHistory'].append(account.get('paymentHistory', ''))
+            accounts_data['paymentStartDate'].append(account.get('paymentStartDate', ''))
+            accounts_data['paymentEndDate'].append(account.get('paymentEndDate', ''))
+            accounts_data['paymentFrequency'].append(account.get('paymentFrequency', ''))
+            # Extract other account details as necessary
+            
+      #######################################################################################################
+        
+        #similarly we need to extract all ENQUIRY details from the cibil response
+        
+        # Extracting account details
+        enquiries = response['apimsg']['consumerCreditData'][0].get('enquiries', [])
+        
+        # Initialize a dictionary to hold account details
+        enquiries_data = {
+            'enquiry_date': [],
+            'enquiry_purpose': [],
+            'enquiry_amount': [],
+            
+            
+            # Add other fields as necessary
+        }
+
+        # Iterate over each account and extract details
+        for enquiry in enquiries:
+            enquiries_data['enquiry_date'].append(enquiry.get('enquiryDate', ''))
+            enquiries_data['enquiry_purpose'].append(enquiry.get('enquiryPurpose', ''))
+            enquiries_data['enquiry_amount'].append(enquiry.get('enquiryAmount', ''))
+            
+        
+        
+    #########################################################################################################        
+        # Return the extracted data as a Series (which will be converted to columns)
+        return pd.Series({
+            'is_success': is_success,
+            'cibil_fetch_date':cibil_fetch_date,
+            'name': names,
+            'birth_date': birth_date,
+            'gender': gender,
+            'score': score,
+            'total_accounts' :total_accounts,
+            'overdue_accounts': overdue_accounts,
+            'closed_accounts': closed_accounts,
+            'total_sanctioned_amount': total_sanctioned_amount,
+            'total_current_balance_rem': total_current_balance_rem,
+            'total_overdue_running': total_overdue_running,
+            'recent_account_opened': recent_account_opened,
+            'total_current_balance_rem': total_current_balance_rem, # Duplicate variable, consider renaming if needed
+            'total_enquiry': total_enquiry,
+            'last_30_days_enq': last_30_days_enq,
+            'last_12_days_enq': last_12_days_enq,
+            'last_24_days_enq': last_24_days_enq,
+            'recent_enq_done': recent_enq_done,
+
+        
+            'accounts': json.dumps(accounts_data),  # Convert the dictionary to a JSON string to store in the DataFrame
+            'enquiries': json.dumps(enquiries_data),
+            'identities': json.dumps(identities_data),
+            'telephones' : json.dumps(telephones_data),
+            'emails' : json.dumps(emails_data),
+            'addresses' : json.dumps(addresses_data)
+            
+        })
+    except json.JSONDecodeError:
+        # In case the JSON data is invalid
+        print('Invalid JSON')
+        return pd.Series({
+            'is_success': None,
+            'cibil_fetch_date':None,
+            'name': None,
+            'birth_date': None,
+            'gender': None,
+            'score': None,
+            'total_accounts': None,
+            'overdue_accounts': None,
+            'closed_accounts': None,
+            'total_sanctioned_amount': None,
+            'total_current_balance_rem': None,
+            'total_overdue_running': None,
+            'recent_account_opened': None,
+            'total_current_balance_rem': None,  
+            'total_enquiry': None,
+            'last_30_days_enq': None,
+            'last_12_days_enq': None,
+            'last_24_days_enq': None,
+            'recent_enq_done': None,
+            'accounts': None,  
+            'enquiries': None,
+            'identities': None,
+            'telephones': None,
+            'emails': None,
+            'addresses': None
+            
+
+        })
+
+# Apply the function to each row of the DataFrame
+parsed_columns = df.apply(parse_json, axis=1)
+
+# Drop the original columns that will be replaced by the parsed data
+#df.drop(columns=['is_success'], inplace=True)
+# Drop the original columns that will be replaced by the parsed data
+df.drop(columns=['api_response'], inplace=True)  # Make sure to drop the column with the original JSON data if not needed anymore
+
+# Join the parsed columns to the original DataFrame
+df = df.join(parsed_columns)
